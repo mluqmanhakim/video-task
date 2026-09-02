@@ -40,8 +40,8 @@ def check_if_enter_store(previous, current, entrance_a, entrance_b):
     """
     Determine whether a trajectory crossed a line and toward direction of entering store
     """
-    previous_side = get_side_of_line(previous, ENTRANCE_A, ENTRANCE_B)
-    current_side = get_side_of_line(current, ENTRANCE_A, ENTRANCE_B)
+    previous_side = get_side_of_line(previous, entrance_a, entrance_b)
+    current_side = get_side_of_line(current, entrance_a, entrance_b)
 
     if previous_side < 0 and current_side > 0:
         return True
@@ -53,8 +53,6 @@ if __name__ == "__main__":
     STOP_ZONE = np.array(
         [[524, 180], [1110, 464], [1120, 327], [375, 255]], dtype=np.int32
     )
-    previous = (1078, 384)
-
     ENTRANCE_A = (375, 255)
     ENTRANCE_B = (1110, 464)
 
