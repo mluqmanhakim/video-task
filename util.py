@@ -1,0 +1,63 @@
+import cv2
+import numpy as np
+
+
+def check_point_in_polygon(point, polygon):
+    """
+    Check whether a point is inside a polygon.
+    """
+    x, y = point
+    return cv2.pointPolygonTest(polygon, (float(x), float(y)), False) >= 0
+
+
+def get_side_of_line(point, line_point1, line_point2):
+    """
+    Determine which side of line a point is on.
+    Returns positive/negative value.
+    """
+    px, py = point
+    ax, ay = line_point1
+    bx, by = line_point2
+
+    return (bx - ax) * (py - ay) - (by - ay) * (px - ax)
+
+
+def crossed_line(previous, current, a, b):
+    """
+    Determine whether trajectory crossed a line.
+    """
+
+    if previous is None:
+        return False
+
+    side1 = get_side_of_line(previous, a, b)
+    side2 = get_side_of_line(current, a, b)
+
+    return side1 * side2 < 0
+
+
+def check_if_enter_store(previous, current, entrance_a, entrance_b):
+    """
+    Determine whether a trajectory crossed a line and toward direction of entering store
+    """
+    previous_side = get_side_of_line(previous, ENTRANCE_A, ENTRANCE_B)
+    current_side = get_side_of_line(current, ENTRANCE_A, ENTRANCE_B)
+
+    if previous_side < 0 and current_side > 0:
+        return True
+
+    return False
+
+
+if __name__ == "__main__":
+    STOP_ZONE = np.array(
+        [[524, 180], [1110, 464], [1120, 327], [375, 255]], dtype=np.int32
+    )
+    previous = (1078, 384)
+
+    ENTRANCE_A = (375, 255)
+    ENTRANCE_B = (1110, 464)
+
+    current = (766, 384)
+
+
