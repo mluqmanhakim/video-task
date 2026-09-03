@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 
-def check_point_in_polygon(point, polygon):
+def check_point_in_stop_zone(point, polygon):
     """
     Check whether a point is inside a polygon.
     """
@@ -22,18 +22,13 @@ def get_side_of_line(point, line_point1, line_point2):
     return (bx - ax) * (py - ay) - (by - ay) * (px - ax)
 
 
-def crossed_line(previous, current, a, b):
-    """
-    Determine whether trajectory crossed a line.
-    """
+def check_if_exit_store(previous, current, entrance_a, entrance_b):
+    previous_side = get_side_of_line(previous, entrance_a, entrance_b)
+    current_side = get_side_of_line(current, entrance_a, entrance_b)
 
-    if previous is None:
-        return False
-
-    side1 = get_side_of_line(previous, a, b)
-    side2 = get_side_of_line(current, a, b)
-
-    return side1 * side2 < 0
+    if previous_side > 0 and current_side < 0:
+        return True
+    return False
 
 
 def check_if_enter_store(previous, current, entrance_a, entrance_b):
@@ -45,7 +40,6 @@ def check_if_enter_store(previous, current, entrance_a, entrance_b):
 
     if previous_side < 0 and current_side > 0:
         return True
-
     return False
 
 
@@ -57,5 +51,3 @@ if __name__ == "__main__":
     ENTRANCE_B = (1110, 464)
 
     current = (766, 384)
-
-

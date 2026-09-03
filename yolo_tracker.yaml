@@ -1,0 +1,8 @@
+tracker_type: bytetrack # or bytetrack, tracktrack, etc.
+track_high_thresh: 0.3
+track_low_thresh: 0.1
+new_track_thresh: 0.4
+track_buffer: 15    # lower value so lost IDs are forgotten quickly
+match_thresh: 0.85  # higher value enforces strict location overlap matching
+with_reid: True     # enforces visual/appearance-based verification
+fuse_score: True
