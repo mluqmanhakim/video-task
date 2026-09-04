@@ -7,22 +7,25 @@ from pathlib import Path
 
 from util import check_if_enter_store, check_if_exit_store, check_point_in_stop_zone, put_top_right_text
 
-
 current_dir = Path.cwd()
-data_dir = current_dir.parents[0] / "data"
+
 config_path = current_dir.parents[0] / "config" / "task1.json"
-video_path = data_dir / "enter.mp4"
-output_dir = data_dir / "output"
-output_dir.mkdir(parents=True, exist_ok=True)
-output_path = output_dir / "task1_output.mp4"
-
-# VIDEO_PATH = "/Users/luqman/Downloads/Hendricks_Retail_Video_Analytics_Take_Home_Assessment_Brief_v5 1/raw_videos/entrance.mp4"
-
-# VIDEO_PATH = "/Users/luqman/Downloads/enter.mp4"
-
 
 with open(config_path, "r", encoding="utf-8") as f:
     config = json.load(f)
+
+
+video_path = current_dir.parents[0] / "input" / "enter.mp4"
+output_dir = current_dir.parents[0] / "output"
+output_path = output_dir / "task1_output.mp4"
+
+
+
+# VIDEO_PATH = "/Users/luqman/Downloads/Hendricks_Retail_Video_Analytics_Take_Home_Assessment_Brief_v5 1/raw_videos/entrance.mp4"
+# VIDEO_PATH = "/Users/luqman/Downloads/enter.mp4"
+
+
+
 
 
 # Minimum number of frames a person must remain almost stationary to be considered stopped.
