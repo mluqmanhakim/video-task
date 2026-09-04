@@ -1,0 +1,5 @@
+{
+    "stop_frames": 90,
+    "stop_distance": 5,
+    "history_length": 120
+}

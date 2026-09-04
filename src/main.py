@@ -2,41 +2,35 @@ import cv2
 import numpy as np
 from ultralytics import YOLO
 from collections import defaultdict, deque
+import json
+from pathlib import Path
+
+from util import check_if_enter_store, check_if_exit_store, check_point_in_stop_zone, put_top_right_text
 
 
-from util import check_if_enter_store, check_if_exit_store, check_point_in_stop_zone
+current_dir = Path.cwd()
+data_dir = current_dir.parents[0] / "data"
+config_path = current_dir.parents[0] / "config" / "task1.json"
+video_path = data_dir / "enter.mp4"
+output_dir = data_dir / "output"
+output_dir.mkdir(parents=True, exist_ok=True)
+output_path = output_dir / "task1_output.mp4"
+
+# VIDEO_PATH = "/Users/luqman/Downloads/Hendricks_Retail_Video_Analytics_Take_Home_Assessment_Brief_v5 1/raw_videos/entrance.mp4"
+
+# VIDEO_PATH = "/Users/luqman/Downloads/enter.mp4"
 
 
-def put_top_right_text(text, image_height, image_width, image, height_margin=0):
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    font_scale = 1
-    thickness = 1
-    color = (0, 255, 150)  # Green in BGR
-    (text_width, text_height), _ = cv2.getTextSize(text, font, font_scale, thickness)
-
-    # Set top-right coordinates with a 20-pixel margin from the edges
-    margin = 20
-    x = image_width - text_width - margin
-    y = (
-        text_height + margin + height_margin
-    )  # Y flows downward, so add height to pull it into view
-
-    cv2.putText(image, text, (x, y), font, font_scale, color, thickness, cv2.LINE_AA)
-
-
-model = YOLO("yolo26x.pt")
-
-VIDEO_PATH = "/Users/luqman/Downloads/Hendricks_Retail_Video_Analytics_Take_Home_Assessment_Brief_v5 1/raw_videos/entrance.mp4"
-
-VIDEO_PATH = "/Users/luqman/Downloads/enter.mp4"
+with open(config_path, "r", encoding="utf-8") as f:
+    config = json.load(f)
 
 
 # Minimum number of frames a person must remain almost stationary to be considered stopped.
-STOP_FRAMES = 90
+STOP_FRAMES = config["stop_frames"]
 # Maximum movement in pixels between frames to consider a person stationary.
-STOP_DISTANCE = 5
+STOP_DISTANCE = config["stop_distance"]
 # Number of frames to remember for each person
-HISTORY_LENGTH = 120
+HISTORY_LENGTH = config["history_length"]
 
 STOP_ZONE = np.array([[524, 180], [1110, 464], [1120, 327], [375, 255]], dtype=np.int32)
 ENTRANCE_A = (280, 280)
@@ -51,18 +45,16 @@ person_state = defaultdict(lambda: "UNK")
 entered_counter = 0
 pass_by_counter = 0
 
+model = YOLO("yolo26x.pt")
 
-cap = cv2.VideoCapture(VIDEO_PATH)
 
-# Get video properties
+cap = cv2.VideoCapture(video_path)
 fps = cap.get(cv2.CAP_PROP_FPS)
 width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-OUTPUT_PATH = "output.mp4"
 fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-save_video = cv2.VideoWriter(OUTPUT_PATH, fourcc, fps, (width, height))
-
+save_video = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
 
 frame_number = 0
 
@@ -99,7 +91,7 @@ while True:
                 (0, 255, 0),
                 2,
             )
-                
+
             if person_state[person_id] not in ["ENTERED", "PASSED_BY", "EXITED"]:
                 # Use feet position
                 foot_x = int((x1 + x2) / 2)
@@ -151,18 +143,18 @@ while True:
                 if person_state[person_id] == "STOPPED" and not inside_stop_zone:
                     person_state[person_id] = "PASSED_BY"
                     pass_by_counter += 1
-            
+
             counter_text_1 = f"Entered: {entered_counter}, Passed-by: {pass_by_counter}"
             counter_text_2 = f"Total: {entered_counter + pass_by_counter}"
             put_top_right_text(counter_text_1, height, width, frame)
             put_top_right_text(counter_text_2, height, width, frame, height_margin=40)
 
-    cv2.imshow("Store Analysis", frame)
-    key = cv2.waitKey(1) & 0xFF
-    if key == ord("q"):
-        break
+    # cv2.imshow("Task 1", frame)
+    # key = cv2.waitKey(1) & 0xFF
+    # if key == ord("q"):
+    #     break
 
-    # save_video.write(frame)
+    save_video.write(frame)
 
 cap.release()
 cv2.destroyAllWindows()

@@ -43,11 +43,29 @@ def check_if_enter_store(previous, current, entrance_a, entrance_b):
     return False
 
 
+def put_top_right_text(text, image_height, image_width, image, height_margin=0):
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    font_scale = 1
+    thickness = 1
+    color = (0, 255, 150)  # Green in BGR
+    (text_width, text_height), _ = cv2.getTextSize(text, font, font_scale, thickness)
+
+    # Set top-right coordinates with a 20-pixel margin from the edges
+    margin = 20
+    x = image_width - text_width - margin
+    y = (
+        text_height + margin + height_margin
+    )  # Y flows downward, so add height to pull it into view
+
+    cv2.putText(image, text, (x, y), font, font_scale, color, thickness, cv2.LINE_AA)
+
+
 if __name__ == "__main__":
     STOP_ZONE = np.array(
-        [[524, 180], [1110, 464], [1120, 327], [375, 255]], dtype=np.int32
+        [[524, 180], [1120, 327], [1110, 464], [375, 255]], dtype=np.int32
     )
     ENTRANCE_A = (375, 255)
     ENTRANCE_B = (1110, 464)
 
-    current = (766, 384)
+    o = check_point_in_stop_zone(point=(723, 268), polygon=STOP_ZONE)
+    print(o)
