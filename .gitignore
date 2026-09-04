@@ -181,3 +181,4 @@ cython_debug/
 .cursorindexingignore
 .vscode/settings.json
 yolo26x.pt
+yolov8x-face.pt

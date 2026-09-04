@@ -38,7 +38,7 @@ STOP_DISTANCE = 5
 # Number of frames to remember for each person
 HISTORY_LENGTH = 120
 
-STOP_ZONE = np.array([[524, 180], [1110, 464], [1120, 327], [375, 255]], dtype=np.int32)
+STOP_ZONE = np.array([[524, 180], [1120, 327], [1110, 464], [375, 255]], dtype=np.int32)
 ENTRANCE_A = (280, 280)
 ENTRANCE_B = (1110, 464)
 

@@ -45,9 +45,13 @@ def check_if_enter_store(previous, current, entrance_a, entrance_b):
 
 if __name__ == "__main__":
     STOP_ZONE = np.array(
-        [[524, 180], [1110, 464], [1120, 327], [375, 255]], dtype=np.int32
+        [[524, 180], [1120, 327], [1110, 464], [375, 255]], dtype=np.int32
     )
     ENTRANCE_A = (375, 255)
     ENTRANCE_B = (1110, 464)
 
-    current = (766, 384)
+    o = check_point_in_stop_zone(
+            point=(723, 268), polygon=STOP_ZONE
+        )
+    print(o)
+
