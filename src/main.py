@@ -36,7 +36,7 @@ ENTRANCE_B = config["entrance_b"]
 
 yolo_model_path = model_dir / config["yolo_model_filename"]
 face_model_path = model_dir / config["face_model_filename"]
-pose_model_path = model_dir / "model_6DRepNet.pth"
+pose_model_path = model_dir / config["pose_model_filename"]
 yolo_model = YOLO(model=yolo_model_path)
 face_model = YOLO(model=face_model_path)
 pose_model = SixDRepNet(dict_path=pose_model_path, gpu_id=-1)
@@ -61,8 +61,6 @@ entered_counter = 0
 pass_by_counter = 0
 frame_number = 0
 
-print("Processing ...")
-
 while True:
     ret, frame = cap.read()
     if not ret:
@@ -85,16 +83,16 @@ while True:
             x1, y1, x2, y2 = box.astype(int)
 
             # Draw ID + state
-            label = f"ID {person_id}: " f"{person_state[person_id]}"
-            cv2.putText(
-                frame,
-                label,
-                (x1, y1 - 10),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.6,
-                (0, 255, 0),
-                2,
-            )
+            # label = f"ID {person_id}: " f"{person_state[person_id]}"
+            # cv2.putText(
+            #     frame,
+            #     label,
+            #     (x1, y1 - 10),
+            #     cv2.FONT_HERSHEY_SIMPLEX,
+            #     0.6,
+            #     (0, 255, 0),
+            #     2,
+            # )
 
             if person_state[person_id] not in ["ENTERED", "PASSED_BY", "EXITED"]:
                 # Use feet position
@@ -166,22 +164,15 @@ while True:
             put_top_right_text(counter_text_1, height, width, frame)
             put_top_right_text(counter_text_2, height, width, frame, height_margin=40)
 
-#     cv2.imshow("Task 1", frame)
-#     key = cv2.waitKey(1) & 0xFF
-#     if key == ord("q"):
-#         break
-
     save_video.write(frame)
 
 cap.release()
 cv2.destroyAllWindows()
 
-
-print("Writing output into csv ...")
 result_data = {
     "Total Interested": entered_counter + pass_by_counter,
     "Interested Entered": entered_counter,
-    "Interested Passed By": pass_by_counter
+    "Interested Passed By": pass_by_counter,
 }
 df = pd.DataFrame(result_data, index=[0])
 df.to_csv(output_csv_path, index=False)
