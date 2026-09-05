@@ -180,9 +180,8 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 .vscode/settings.json
-yolo26x.pt
-yolov8x-face.pt
+.gitattributes
+
 /output
-.DS_Store
 /input
 /model
