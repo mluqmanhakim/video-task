@@ -1,32 +1,28 @@
-import cv2
-import numpy as np
-from ultralytics import YOLO
 from collections import defaultdict, deque
 import json
 from pathlib import Path
 
-from util import check_if_enter_store, check_if_exit_store, check_point_in_stop_zone, put_top_right_text
+import cv2
+import numpy as np
+import pandas as pd
+from sixdrepnet import SixDRepNet
+from ultralytics import YOLO
+
+from util import (
+    check_if_enter_store,
+    check_if_exit_store,
+    check_point_in_stop_zone,
+    put_top_right_text,
+    detect_face,
+    detect_head_pose,
+)
 
 current_dir = Path.cwd()
-
 config_path = current_dir.parents[0] / "config" / "task1.json"
+model_dir = current_dir.parents[0] / "model"
 
 with open(config_path, "r", encoding="utf-8") as f:
     config = json.load(f)
-
-
-video_path = current_dir.parents[0] / "input" / "enter.mp4"
-output_dir = current_dir.parents[0] / "output"
-output_path = output_dir / "task1_output.mp4"
-
-
-
-# VIDEO_PATH = "/Users/luqman/Downloads/Hendricks_Retail_Video_Analytics_Take_Home_Assessment_Brief_v5 1/raw_videos/entrance.mp4"
-# VIDEO_PATH = "/Users/luqman/Downloads/enter.mp4"
-
-
-
-
 
 # Minimum number of frames a person must remain almost stationary to be considered stopped.
 STOP_FRAMES = config["stop_frames"]
@@ -34,31 +30,34 @@ STOP_FRAMES = config["stop_frames"]
 STOP_DISTANCE = config["stop_distance"]
 # Number of frames to remember for each person
 HISTORY_LENGTH = config["history_length"]
+STOP_ZONE = np.array(config["stop_zone"], dtype=np.int32)
+ENTRANCE_A = config["entrance_a"]
+ENTRANCE_B = config["entrance_b"]
 
-STOP_ZONE = np.array([[524, 180], [1110, 464], [1120, 327], [375, 255]], dtype=np.int32)
-ENTRANCE_A = (280, 280)
-ENTRANCE_B = (1110, 464)
+yolo_model_path = model_dir / config["yolo_model_filename"]
+face_model_path = model_dir / config["face_model_filename"]
+yolo_model = YOLO(model=yolo_model_path)
+face_model = YOLO(model=face_model_path)
+pose_model = SixDRepNet(gpu_id=-1)
 
-
-positions = defaultdict(lambda: deque(maxlen=HISTORY_LENGTH))
-stop_counter = defaultdict(int)
-person_state = defaultdict(lambda: "UNK")
-
-
-entered_counter = 0
-pass_by_counter = 0
-
-model = YOLO("yolo26x.pt")
+video_path = current_dir.parents[0] / "input" / config["input_video_filename"]
+output_dir = current_dir.parents[0] / "output"
+output_path = output_dir / config["output_video_filename"]
+output_csv_path = output_dir / config["output_csv_filename"]
 
 
 cap = cv2.VideoCapture(video_path)
 fps = cap.get(cv2.CAP_PROP_FPS)
 width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-
 fourcc = cv2.VideoWriter_fourcc(*"mp4v")
 save_video = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
 
+positions = defaultdict(lambda: deque(maxlen=HISTORY_LENGTH))
+stop_counter = defaultdict(int)
+person_state = defaultdict(lambda: "UNK")
+entered_counter = 0
+pass_by_counter = 0
 frame_number = 0
 
 while True:
@@ -67,8 +66,7 @@ while True:
         break
     frame_number += 1
 
-    # YOLO + ByteTrack
-    results = model.track(
+    results = yolo_model.track(
         frame,
         persist=True,
         tracker="yolo_tracker.yaml",
@@ -143,7 +141,20 @@ while True:
                     if person_exited:
                         person_state[person_id] = "EXITED"
 
-                if person_state[person_id] == "STOPPED" and not inside_stop_zone:
+                if person_state[person_id] == "STOPPED":
+                    if frame_number % 5 == 0:
+                        person_crop = frame[
+                            max(0, y1) : min(frame.shape[0], y2),
+                            max(0, x1) : min(frame.shape[1], x2),
+                        ]
+                        if person_crop.size > 0:
+                            face_crop = detect_face(person_crop)
+                            if face_crop is not None and face_crop.size > 0:
+                                yaw = detect_head_pose(face_crop)
+                                if yaw >= 30 and yaw <= 90:
+                                    person_state[person_id] = "INTERESTED"
+
+                if person_state[person_id] == "INTERESTED" and not inside_stop_zone:
                     person_state[person_id] = "PASSED_BY"
                     pass_by_counter += 1
 
@@ -152,12 +163,24 @@ while True:
             put_top_right_text(counter_text_1, height, width, frame)
             put_top_right_text(counter_text_2, height, width, frame, height_margin=40)
 
-    # cv2.imshow("Task 1", frame)
-    # key = cv2.waitKey(1) & 0xFF
-    # if key == ord("q"):
-    #     break
+#     cv2.imshow("Task 1", frame)
+#     key = cv2.waitKey(1) & 0xFF
+#     if key == ord("q"):
+#         break
 
-    save_video.write(frame)
+#     # save_video.write(frame)
 
-cap.release()
-cv2.destroyAllWindows()
+# cap.release()
+# cv2.destroyAllWindows()
+
+
+print("Writing output into csv ...")
+result_data = {
+    "Total Interested": entered_counter + pass_by_counter,
+    "Interested Entered": entered_counter,
+    "Interested Passed By": pass_by_counter
+}
+df = pd.DataFrame(result_data, index=[0])
+df.to_csv(output_csv_path, index=False)
+
+print("Done")

@@ -1,5 +1,36 @@
 {
+    "input_video_filename": "enter.mp4",
+    "output_video_filename": "task1_output.mp4",
+    "output_csv_filename": "task1_output.csv",
+    "yolo_model_filename": "yolo26x.pt",
+    "face_model_filename": "yolov8x-face.pt",
     "stop_frames": 90,
     "stop_distance": 5,
-    "history_length": 120
+    "history_length": 120,
+    "stop_zone": [
+        [
+            524,
+            180
+        ],
+        [
+            1120,
+            327
+        ],
+        [
+            1110,
+            464
+        ],
+        [
+            280,
+            280
+        ]
+    ],
+    "entrance_a": [
+        280,
+        280
+    ],
+    "entrance_b": [
+        1110,
+        464
+    ]
 }

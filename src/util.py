@@ -60,12 +60,29 @@ def put_top_right_text(text, image_height, image_width, image, height_margin=0):
     cv2.putText(image, text, (x, y), font, font_scale, color, thickness, cv2.LINE_AA)
 
 
-if __name__ == "__main__":
-    STOP_ZONE = np.array(
-        [[524, 180], [1120, 327], [1110, 464], [375, 255]], dtype=np.int32
-    )
-    ENTRANCE_A = (375, 255)
-    ENTRANCE_B = (1110, 464)
+def detect_face(face_model, person_img):
+    face_results = face_model(person_img, conf=0.4, verbose=False)
 
-    o = check_point_in_stop_zone(point=(723, 268), polygon=STOP_ZONE)
-    print(o)
+    if len(face_results) < 1 or len(face_results[0].boxes) < 1:
+        return None
+
+    face_box = face_results[0].boxes[0]
+    face_x1, face_y1, face_x2, face_y2 = face_box.xyxy[0].cpu().numpy().astype(int)
+
+    pad_x = int((face_x2 - face_x1) * 0.2)
+    pad_y = int((face_y2 - face_y1) * 0.2)
+    px1 = max(0, face_x1 - pad_x)
+    py1 = max(0, face_y1 - pad_y)
+    px2 = min(person_img.shape[1], face_x2 + pad_x)
+    py2 = min(person_img.shape[0], face_y2 + pad_y)
+
+    face_crop = person_img[py1:py2, px1:px2]
+    return face_crop
+
+
+def detect_head_pose(pose_model, face_img):
+    """
+    Return: only yaw
+    """
+    pitch, yaw, roll = pose_model.predict(face_img)
+    return yaw

@@ -4,13 +4,13 @@ import numpy as np
 ENTRANCE_A = (280, 280)
 ENTRANCE_B = (1110, 464)
 
-frame = cv2.imread('frame_1.png')
+frame = cv2.imread('frame.jpg')
 
 STOP_ZONE = np.array([
     [524, 180],
     [1120, 327],
     [1110, 464],
-    [375, 255]
+    [280, 280],
 ], dtype=np.int32)
 
 cv2.polylines(frame, [STOP_ZONE], True, (255, 0, 0), 2)

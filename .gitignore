@@ -182,3 +182,6 @@ cython_debug/
 .vscode/settings.json
 yolo26x.pt
 yolov8x-face.pt
+/output
+.DS_Store
+/input

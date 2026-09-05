@@ -66,7 +66,6 @@ if results[0].boxes.id is not None:
 
                 pad_x = int((face_x2 - face_x1) * 0.2)
                 pad_y = int((face_y2 - face_y1) * 0.2)
-
                 px1 = max(0, face_x1 - pad_x)
                 py1 = max(0, face_y1 - pad_y)
                 px2 = min(person_crop.shape[1], face_x2 + pad_x)
