@@ -36,9 +36,10 @@ ENTRANCE_B = config["entrance_b"]
 
 yolo_model_path = model_dir / config["yolo_model_filename"]
 face_model_path = model_dir / config["face_model_filename"]
+pose_model_path = model_dir / "model_6DRepNet.pth"
 yolo_model = YOLO(model=yolo_model_path)
 face_model = YOLO(model=face_model_path)
-pose_model = SixDRepNet(gpu_id=-1)
+pose_model = SixDRepNet(dict_path=pose_model_path, gpu_id=-1)
 
 video_path = current_dir.parents[0] / "input" / config["input_video_filename"]
 output_dir = current_dir.parents[0] / "output"
@@ -59,6 +60,8 @@ person_state = defaultdict(lambda: "UNK")
 entered_counter = 0
 pass_by_counter = 0
 frame_number = 0
+
+print("Processing ...")
 
 while True:
     ret, frame = cap.read()
@@ -168,10 +171,10 @@ while True:
 #     if key == ord("q"):
 #         break
 
-#     # save_video.write(frame)
+    save_video.write(frame)
 
-# cap.release()
-# cv2.destroyAllWindows()
+cap.release()
+cv2.destroyAllWindows()
 
 
 print("Writing output into csv ...")

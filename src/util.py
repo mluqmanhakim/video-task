@@ -1,5 +1,4 @@
 import cv2
-import numpy as np
 
 
 def check_point_in_stop_zone(point, polygon):

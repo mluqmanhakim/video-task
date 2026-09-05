@@ -1,4 +1,6 @@
-docker build -t tasks:v1 .
+docker build -t task11:v12 .
 
 
-docker run -v C:\Users\mhdlu\github\video-task\output:/output task1:v2
+
+
+docker run -v "${PWD}:/app/output" task11:v11

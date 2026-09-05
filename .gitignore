@@ -185,3 +185,4 @@ yolov8x-face.pt
 /output
 .DS_Store
 /input
+/model

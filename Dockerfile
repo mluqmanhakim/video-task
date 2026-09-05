@@ -18,8 +18,10 @@ COPY config/ /app/config/
 
 COPY input/ /app/input/
 
-RUN mkdir /output
+COPY model/ /app/model/
+
+RUN mkdir /app/output
 
 WORKDIR /app/src
 
-CMD ["python", "main.py"]
+CMD ["python", "temp.py"]
