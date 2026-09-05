@@ -149,9 +149,13 @@ while True:
                             max(0, x1) : min(frame.shape[1], x2),
                         ]
                         if person_crop.size > 0:
-                            face_crop = detect_face(person_crop)
+                            face_crop = detect_face(
+                                face_model=face_model, person_img=person_crop
+                            )
                             if face_crop is not None and face_crop.size > 0:
-                                yaw = detect_head_pose(face_crop)
+                                yaw = detect_head_pose(
+                                    pose_model=pose_model, face_img=face_crop
+                                )
                                 if yaw >= 30 and yaw <= 90:
                                     person_state[person_id] = "INTERESTED"
 

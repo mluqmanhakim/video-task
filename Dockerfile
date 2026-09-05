@@ -24,4 +24,4 @@ RUN mkdir /app/output
 
 WORKDIR /app/src
 
-CMD ["python", "temp.py"]
+CMD ["python", "main.py"]

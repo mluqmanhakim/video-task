@@ -1,4 +1,4 @@
-tracker_type: bytetrack # or bytetrack, tracktrack, etc.
+tracker_type: bytetrack
 track_high_thresh: 0.3
 track_low_thresh: 0.1
 new_track_thresh: 0.4
