@@ -185,3 +185,4 @@ cython_debug/
 /output
 /input
 /model
+temp_out/.DS_Store
