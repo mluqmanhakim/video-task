@@ -1,4 +1,12 @@
 import cv2
+import numpy as np
+
+shelf_a = np.array([[725, 340], [815, 240], [1060, 400], [1010, 500]], dtype=np.int32)
+shelf_ab = np.array([[540, 435], [680, 355], [970, 550], [830, 720]], dtype=np.int32)
+shelf_b = np.array([[215, 580], [442, 530], [640, 720], [285, 720]], dtype=np.int32)
+shelf_c = np.array([[343, 460], [670, 315], [740, 360], [410, 530]], dtype=np.int32)
+shelf_d = np.array([[148, 430], [260, 400], [580, 720], [285, 720]], dtype=np.int32)
+all_shelfs = [shelf_a, shelf_ab, shelf_b, shelf_c, shelf_d]
 
 
 def check_point_in_stop_zone(point, polygon):
@@ -85,3 +93,66 @@ def detect_head_pose(pose_model, face_img):
     """
     pitch, yaw, roll = pose_model.predict(face_img)
     return yaw
+
+
+def check_point_in_polygon(point, polygon):
+    """
+    Check whether a point is inside a polygon.
+    """
+    x, y = point
+    return cv2.pointPolygonTest(polygon, (float(x), float(y)), False) >= 0
+
+
+def check_position_inside_any_shelf(position):
+    for i, shelf in enumerate(all_shelfs):
+        in_shelf = check_point_in_polygon(position, shelf)
+        if in_shelf:
+            return True
+    return False
+
+
+def get_shelf_interest(position, person_img, face_model, pose_model):
+    face_crop = detect_face(face_model=face_model, person_img=person_img)
+    yaw = None
+    if face_crop is not None and face_crop.size > 0:
+        yaw = detect_head_pose(pose_model=pose_model, face_img=face_crop)
+    else:
+        return None
+
+    in_shelf_d = check_point_in_polygon(position, shelf_d)
+    if in_shelf_d:
+        if yaw >= 15 and yaw < 50:
+            return "D"
+
+    in_shelf_b = check_point_in_polygon(position, shelf_b)
+    if in_shelf_b:
+        if yaw > -40 and yaw < 15:
+            return "B"
+
+    in_shelf_ab = check_point_in_polygon(position, shelf_ab)
+    if in_shelf_ab:
+        if yaw >= 20 and yaw < 50:
+            return "B"
+        elif yaw > -20 and yaw < 25:
+            return "A"
+
+    in_shelf_c = check_point_in_polygon(position, shelf_c)
+    if in_shelf_c:
+        if yaw >= -30 and yaw <= 2:
+            return "C"
+
+    return None
+
+
+def put_person_label(person_id, label, frame, label_position):
+    label_text = f"ID {person_id}: {label}"
+    x1, y1 = label_position
+    cv2.putText(
+        frame,
+        label_text,
+        (x1, y1 - 10),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.6,
+        (0, 255, 0),
+        2,
+    )
