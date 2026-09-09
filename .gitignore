@@ -187,3 +187,10 @@ cython_debug/
 /model
 temp_out/.DS_Store
 .DS_Store
+/clean_dataset
+/runs
+yolov8l-world.pt
+yolo26x.pt
+yolo11n.pt
+/weights
+yolo11n-cls.pt
