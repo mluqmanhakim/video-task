@@ -65,9 +65,6 @@ def main():
             break
         frame_number += 1
 
-        if frame_number == 300:
-            break
-
         results = yolo_model.track(
             frame,
             persist=True,
@@ -175,6 +172,15 @@ def main():
 
     cap.release()
     cv2.destroyAllWindows()
+
+    result_data = {
+        "Interested in Shelf A": len(shelf_a_people),
+        "Interested in Shelf B": len(shelf_b_people),
+        "Interested in Shelf C": len(shelf_c_people),
+        "Interested in Shelf D": len(shelf_d_people),
+    }
+    df = pd.DataFrame(result_data, index=[0])
+    df.to_csv(output_csv_path, index=False)
 
 
 if __name__ == "__main__":

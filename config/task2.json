@@ -3,6 +3,6 @@
   "output_video_filename": "task2_output.mp4",
   "output_csv_filename": "task2_output.csv",
   "yolo_model_filename": "yolo26x.pt",
-  "face_model_filename": "yolov8x-face.pt",
+  "face_model_filename": "yolov12l-face.pt",
   "pose_model_filename": "6DRepNet_70_30_BIWI.pth"
 }
