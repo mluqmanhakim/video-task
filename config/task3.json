@@ -2,5 +2,6 @@
   "input_video_filename": "entrance.mp4",
   "output_video_filename": "task3_output.mp4",
   "output_csv_filename": "task3_output.csv",
-  "yolo_model_filename": "yolo26x.pt"
+  "yolo_model_filename": "yolo26x.pt",
+  "staff_model_filename": "staff_model.pt"
 }

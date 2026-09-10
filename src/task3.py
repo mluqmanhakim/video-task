@@ -7,17 +7,10 @@ import numpy as np
 import pandas as pd
 from ultralytics import YOLO
 
-from util import put_top_right_text, put_person_label, check_point_in_polygon
+from util import put_person_label, check_point_in_polygon
 
-store = np.array(
-    [
-        [0, 165],
-        [1140, 450],
-        [1280, 720],
-        [0, 720],
-    ],
-    dtype=np.int32,
-)
+
+STORE_ZONE = np.array([[0, 165], [1140, 450], [1280, 720], [0, 720]], dtype=np.int32)
 
 
 def main():
@@ -31,8 +24,7 @@ def main():
     yolo_model_path = model_dir / config["yolo_model_filename"]
     yolo_model = YOLO(model=yolo_model_path)
 
-    staff_model_path = "/Users/luqman/Documents/GitHub/video-task/model/staff_model.pt"
-
+    staff_model_path = model_dir / config["staff_model_filename"]
     staff_model = YOLO(staff_model_path)
 
     video_path = current_dir.parents[0] / "input" / config["input_video_filename"]
@@ -87,7 +79,7 @@ def main():
                 if person_crop.size <= 0:
                     continue
 
-                inside_store = check_point_in_polygon(current_position, store)
+                inside_store = check_point_in_polygon(current_position, STORE_ZONE)
 
                 if not inside_store:
                     continue
