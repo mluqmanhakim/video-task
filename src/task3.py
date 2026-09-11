@@ -48,7 +48,8 @@ def main():
             break
         frame_number += 1
 
-        if frame_number % 5 != 0:
+        if frame_number % 2 == 0:
+            save_video.write(frame)
             continue
 
         results = yolo_model.track(
@@ -100,10 +101,10 @@ def main():
                     )
                     break
 
-        cv2.imshow("Display Window", frame)
-        if cv2.waitKey(1) & 0xFF == ord("q"):
-            break
-        # save_video.write(frame)
+        # cv2.imshow("Display Window", frame)
+        # if cv2.waitKey(1) & 0xFF == ord("q"):
+        #     break
+        save_video.write(frame)
 
     cap.release()
     cv2.destroyAllWindows()
