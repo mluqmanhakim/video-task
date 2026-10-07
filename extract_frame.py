@@ -1,9 +1,9 @@
 import cv2
 
 
-FRAME_INDEX = 9900
+FRAME_INDEX = 240
 
-video_path = '/Users/luqman/Downloads/Hendricks_Retail_Video_Analytics_Take_Home_Assessment_Brief_v5 1/raw_videos/entrance.mp4'
+video_path = 'task3_output.mp4'
 
 cap = cv2.VideoCapture(video_path)
 
